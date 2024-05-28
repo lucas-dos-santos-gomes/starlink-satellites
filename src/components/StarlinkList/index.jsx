@@ -6,11 +6,11 @@ import 'leaflet/dist/leaflet.css';
 import { List } from './style';
 
 const satIcon = new L.Icon({
-    iconUrl: 'satellite.png',
-    iconSize: [25,25],
-    iconAnchor: [12,12],
-    popupAnchor: [0, -12]
-})
+  iconUrl: 'black-satellite.png',
+  iconSize: [25,25],
+  iconAnchor: [12,12],
+  popupAnchor: [0, -12]
+});
 
 export default function StarlinkList() {
   const [starlinks, setStarlinks] = useState([]);

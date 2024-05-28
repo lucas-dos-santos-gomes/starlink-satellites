@@ -1,5 +1,6 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import List from './style';
 
 export default function StarlinkList() {
   const [starlinks, setStarlinks] = useState([]);
@@ -15,11 +16,15 @@ export default function StarlinkList() {
   }, []);
 
   return (
-    <>
+    <List>
       <h1>Satélites da Starlink</h1>
-      {starlinks.length === 0 ? (<p>Carregando satélites...</p>) : starlinks.map(satellite => (
-        <li key={satellite.id}>{satellite.spaceTrack.OBJECT_NAME}</li>
-      ))}
-    </>
+      <ul>
+        {starlinks.length === 0 ? (<p>Carregando satélites...</p>) : (<ul>
+          {starlinks.map(satellite => (
+            <li key={satellite.id}>{satellite.spaceTrack.OBJECT_NAME}</li>
+          ))}
+        </ul>)}
+      </ul>
+    </List>
   );
 }

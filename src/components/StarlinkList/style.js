@@ -1,12 +1,19 @@
 import styled from "styled-components";
 
-const List = styled.div`
+export const List = styled.div`
   & {
-    width: 100vw;
+    max-height: 100vh;
   }
+
   & > h1 {
+    font-size: 30px;
+    line-height: 1.1;
     text-align: center;
+    margin-block: 20px;
+  }
+
+  & li {
+    padding: 5px 20px;
+    list-style: disc;
   }
 `;
-
-export default List;

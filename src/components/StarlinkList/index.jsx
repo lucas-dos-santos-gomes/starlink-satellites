@@ -14,15 +14,32 @@ const satIcon = new L.Icon({
 
 export default function StarlinkList() {
   const [starlinks, setStarlinks] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(true);
 
-  useEffect(() => {
+  const fetchStarlinks = page => {
     axios.post('https://api.spacexdata.com/v4/starlink/query', {
       "query": {},
-      "options": { limit: 100 }
-    }).then(res => setStarlinks(res.data.docs)).catch(err => {
-      alert('Houve um erro na requisição');
+      "options": { page: page, limit: 100 }
+    }).then(res => {
+      setStarlinks(nowDocs => [...nowDocs, ...res.data.docs]);
+      setHasNextPage(res.data.hasNextPage);
+    }).catch(err => {
+      alert('Houve um erro de requisição de dados.');
       console.log(err);
     });
+  }
+
+  const loadMore = () => {
+    if(hasNextPage) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchStarlinks(nextPage);
+    }
+  };
+
+  useEffect(() => {
+    fetchStarlinks(1);
   }, []);
 
   return (
@@ -30,16 +47,26 @@ export default function StarlinkList() {
       <h1>Satélites da Starlink</h1>
       <MapContainer center={[0,0]} zoom={2} style={{ height: '70vh', width:'80vw' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        {starlinks
-          .filter((sat) => sat.latitude !== null && sat.longitude !==null)
-          .map((sat) => (
-            <Marker key={sat.id} position={[sat.latitude, sat.longitude]} icon={satIcon}>
-              <Popup>
-                {sat.spaceTrack.OBJECT_NAME}
-              </Popup>
-            </Marker>
+        {starlinks.filter((sat) => sat.latitude !== null && sat.longitude !==null).map((sat) => (
+          <Marker key={sat.id} position={[sat.latitude, sat.longitude]} icon={satIcon}>
+            <Popup>
+              <div>
+                <h2>{sat.spaceTrack.OBJECT_NAME}</h2>
+                <p>Latitude: {sat.latitude}</p>
+                <p>Longitude: {sat.longitude}</p>
+                <p>Velocidade: {sat.velocity_kms}</p>
+                <p>Altura: {sat.height_km}</p>
+                <p>Data de lançamento: {sat.spaceTrack.LAUNCH_DATE}</p>
+              </div>
+            </Popup>
+          </Marker>
         ))}
-    </MapContainer>
+      </MapContainer>
+      {hasNextPage && (
+        <div style={{textAlign: 'center', margin:'20px 0'}}>
+          <button onClick={loadMore}>Carregar mais</button>
+        </div>
+      )}
     </List>
   );
 }

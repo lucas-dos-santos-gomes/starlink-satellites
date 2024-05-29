@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
+import Button from '../Button';
 import 'leaflet/dist/leaflet.css';
 import { List } from './style';
 
@@ -64,7 +65,7 @@ export default function StarlinkList() {
       </MapContainer>
       {hasNextPage && (
         <div style={{textAlign: 'center', margin:'20px 0'}}>
-          <button onClick={loadMore}>Carregar mais</button>
+          <Button onClick={loadMore}>Carregar mais</Button>
         </div>
       )}
     </List>

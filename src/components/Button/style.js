@@ -15,7 +15,7 @@ export const StyledButton = styled.button`
     transition-duration: .3s;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
     background-color: rgb(255, 65, 65);
-    margin: auto;
+    margin: 0 auto 10px;
   }
 
   /* plus sign */
@@ -41,13 +41,14 @@ export const StyledButton = styled.button`
     width: 0%;
     opacity: 0;
     color: white;
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: 600;
     transition-duration: .3s;
+    white-space: nowrap;
   }
   /* hover effect on button width */
   &:hover {
-    width: 125px;
+    width: 160px;
     border-radius: 40px;
     transition-duration: .3s;
   }
@@ -55,14 +56,13 @@ export const StyledButton = styled.button`
   &:hover .sign {
     width: 30%;
     transition-duration: .3s;
-    padding-left: 20px;
   }
   /* hover effect button's text */
   &:hover .text {
     opacity: 1;
-    width: 70%;
+    width: 80%;
     transition-duration: .3s;
-    padding-right: 10px;
+    padding-right: 5px;
   }
   /* button click effect*/
   &:active {

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import Button from '../Button';
@@ -17,6 +17,8 @@ export default function StarlinkList() {
   const [starlinks, setStarlinks] = useState([]);
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(true);
+  const [total, setTotal] = useState(0);
+  const start = useRef(true);
 
   const fetchStarlinks = page => {
     axios.post('https://api.spacexdata.com/v4/starlink/query', {
@@ -25,6 +27,7 @@ export default function StarlinkList() {
     }).then(res => {
       setStarlinks(nowDocs => [...nowDocs, ...res.data.docs]);
       setHasNextPage(res.data.hasNextPage);
+      setTotal(res.data.totalDocs);
     }).catch(err => {
       alert('Houve um erro de requisição de dados.');
       console.log(err);
@@ -40,13 +43,16 @@ export default function StarlinkList() {
   };
 
   useEffect(() => {
-    fetchStarlinks(1);
+    if(start.current) {
+      fetchStarlinks(1);
+      start.current = false;
+    }
   }, []);
 
   return (
     <List>
       <h1>Satélites da Starlink</h1>
-      <MapContainer center={[0,0]} zoom={2} style={{ height: '70vh', width:'80vw' }}>
+      <MapContainer center={[0,0]} zoom={2} style={{ height: '65vh', width:'80vw' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {starlinks.filter((sat) => sat.latitude !== null && sat.longitude !==null).map((sat) => (
           <Marker key={sat.id} position={[sat.latitude, sat.longitude]} icon={satIcon}>
@@ -63,11 +69,10 @@ export default function StarlinkList() {
           </Marker>
         ))}
       </MapContainer>
-      {hasNextPage && (
-        <div style={{textAlign: 'center', margin:'20px 0'}}>
-          <Button onClick={loadMore}>Carregar mais</Button>
-        </div>
-      )}
+      <div style={{textAlign: 'center', margin:'20px 0'}}>
+        {hasNextPage && (<Button onClick={loadMore}>Carregar mais</Button>)}
+        <p>{starlinks.length} satélites carregados de um total de {total}</p>
+      </div>
     </List>
   );
 }

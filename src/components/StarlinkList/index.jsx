@@ -19,9 +19,11 @@ export default function StarlinkList() {
   const [hasNextPage, setHasNextPage] = useState(true);
   const [hasPrevPage, setHasPrevPage] = useState(false);
   const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
   const start = useRef(true);
 
   const fetchStarlinks = (page, more) => {
+    setLoading(true);
     axios.post('https://api.spacexdata.com/v4/starlink/query', {
       "query": {},
       "options": { page: page, limit: 100 }
@@ -30,9 +32,11 @@ export default function StarlinkList() {
       setHasNextPage(res.data.hasNextPage);
       setHasPrevPage(res.data.hasPrevPage);
       setTotal(res.data.totalDocs);
+      setLoading(false);
     }).catch(err => {
       alert('Houve um erro de requisição de dados.');
       console.log(err);
+      setLoading(false);
     });
   }
 
@@ -59,8 +63,6 @@ export default function StarlinkList() {
     }
   }, []);
 
-  useEffect(() => console.log(starlinks), [starlinks])
-
   return (
     <List>
       <h1>Satélites da Starlink</h1>
@@ -85,12 +87,12 @@ export default function StarlinkList() {
         <div style={{display: 'flex', justifyContent: 'center'}}>
           {hasPrevPage && (
             <div style={{width: '180px', display: 'flex', justifyContent: 'center'}}>
-              <Button onClick={loadLess} more={false}>Carregar menos</Button>
+              <Button onClick={loadLess} more={false}>{loading ? 'Carregando...' : 'Carregar menos'}</Button>
             </div>
           )}
           {hasNextPage && (
             <div style={{width: '180px', display: 'flex', justifyContent: 'center'}}>
-              <Button onClick={loadMore} more>Carregar mais</Button>
+              <Button onClick={loadMore} more>{loading ? 'Carregando...' : 'Carregar mais'}</Button>
             </div>
           )}
         </div>

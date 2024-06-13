@@ -17,16 +17,18 @@ export default function StarlinkList() {
   const [starlinks, setStarlinks] = useState([]);
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(true);
+  const [hasPrevPage, setHasPrevPage] = useState(false);
   const [total, setTotal] = useState(0);
   const start = useRef(true);
 
-  const fetchStarlinks = page => {
+  const fetchStarlinks = (page, more) => {
     axios.post('https://api.spacexdata.com/v4/starlink/query', {
       "query": {},
       "options": { page: page, limit: 100 }
     }).then(res => {
-      setStarlinks(nowDocs => [...nowDocs, ...res.data.docs]);
+      setStarlinks(nowDocs => more ? [...nowDocs, ...res.data.docs] : nowDocs.length >= 200 ? [...nowDocs].splice(0, nowDocs.length - 100) : []);
       setHasNextPage(res.data.hasNextPage);
+      setHasPrevPage(res.data.hasPrevPage);
       setTotal(res.data.totalDocs);
     }).catch(err => {
       alert('Houve um erro de requisição de dados.');
@@ -38,23 +40,33 @@ export default function StarlinkList() {
     if(hasNextPage) {
       const nextPage = page + 1;
       setPage(nextPage);
-      fetchStarlinks(nextPage);
+      fetchStarlinks(nextPage, true);
     }
   };
 
+  const loadLess = () => {
+    if(hasPrevPage) {
+      const prevPage = page - 1;
+      setPage(prevPage);
+      fetchStarlinks(prevPage, false);
+    }
+  }
+
   useEffect(() => {
     if(start.current) {
-      fetchStarlinks(1);
+      fetchStarlinks(1, true);
       start.current = false;
     }
   }, []);
+
+  useEffect(() => console.log(starlinks), [starlinks])
 
   return (
     <List>
       <h1>Satélites da Starlink</h1>
       <MapContainer center={[0,0]} zoom={2} style={{ height: '65vh', width:'80vw' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        {starlinks.filter((sat) => sat.latitude !== null && sat.longitude !==null).map((sat) => (
+        {starlinks.filter((sat) => sat.latitude !== null && sat.longitude !== null).map((sat) => (
           <Marker key={sat.id} position={[sat.latitude, sat.longitude]} icon={satIcon}>
             <Popup>
               <div>
@@ -70,7 +82,18 @@ export default function StarlinkList() {
         ))}
       </MapContainer>
       <div style={{textAlign: 'center', margin:'20px 0'}}>
-        {hasNextPage && (<Button onClick={loadMore}>Carregar mais</Button>)}
+        <div style={{display: 'flex', justifyContent: 'center'}}>
+          {hasPrevPage && (
+            <div style={{width: '180px', display: 'flex', justifyContent: 'center'}}>
+              <Button onClick={loadLess} more={false}>Carregar menos</Button>
+            </div>
+          )}
+          {hasNextPage && (
+            <div style={{width: '180px', display: 'flex', justifyContent: 'center'}}>
+              <Button onClick={loadMore} more>Carregar mais</Button>
+            </div>
+          )}
+        </div>
         <p>{starlinks.length} satélites carregados de um total de {total}</p>
       </div>
     </List>

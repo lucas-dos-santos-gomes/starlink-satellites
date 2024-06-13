@@ -14,8 +14,8 @@ export const StyledButton = styled.button`
     overflow: hidden;
     transition-duration: .3s;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
-    background-color: rgb(255, 65, 65);
-    margin: 0 auto 10px;
+    background-color: ${({ more }) => more === 'more' ? 'rgb(65, 255, 65)' : 'rgb(255, 65, 65)'};
+    margin: 0 0 10px;
   }
 
   /* plus sign */
@@ -48,7 +48,7 @@ export const StyledButton = styled.button`
   }
   /* hover effect on button width */
   &:hover {
-    width: 160px;
+    width: ${({ more }) => more === 'more' ? '160px' : '170px'};
     border-radius: 40px;
     transition-duration: .3s;
   }
